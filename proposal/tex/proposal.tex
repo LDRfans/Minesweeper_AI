@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[aspectratio=169]{beamer}
 \usepackage[utf8]{inputenc}
 
 \usepackage{utopia} %font utopia imported
@@ -98,20 +98,48 @@
 
 %---------------------------------------------------------
 
-\section{POMDP Model}
+\section{POMDP View}
 % Chenyang Zhang
 
 \begin{frame}
-\frametitle{POMDP Model}
-POMDP: Partially Observable Markov Decision Process
-
-\begin{itemize}
-    \item A generalization of a Markov decision process (MDP)
-    \item Text 2
-\end{itemize}
+	\frametitle{POMDP Model}
+	POMDP: Partially Observable Markov Decision Process
+	\begin{itemize}
+	    \item Generalization of a Markov decision process (MDP)
+	    \item Agent cannot directly observe the underlying state
+	    \item Maintain a probability distribution over the set of possible states
+	\end{itemize}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Minesweeper POMDP Model}
+	Minesweeper game can be modeled as a POMDP $<S, S_e, A, T, R, O, \Omega, b_0>$ where:
 
+	\begin{itemize}
+		\item set of states $S$: init state, normal states, failure state
+		\item terminal state $S_e$: success state, failure state
+		\item actions in $A$: try hidden cell $c$
+		\item transition function $T$
+		\item reward $R(s, a, s')$
+		\item observations in $O$
+		\item observation function $\Omega$: updates the knowledge matrix according to the last action
+		\item $b_0$: initial probability distribution over states
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{POMDP Challenges}
+	Belief space is huge: 
+	\begin{itemize}
+		\item $2^{W \times H}$ states!
+		\item Solving POMDPs exactly is computationally intractable
+		\item MOMDP: Mixed Observability Markov Decision Process
+		\begin{itemize}
+			\item we can derive a compact lower-dimensional representation of the belief space
+		\end{itemize}
+		\item Monte-Carlo Tree Search
+	\end{itemize}
+\end{frame}
 
 
 %---------------------------------------------------------
