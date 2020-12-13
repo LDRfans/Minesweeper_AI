@@ -108,10 +108,22 @@
 	Searching for a single configuration compatible with $K$ can be formulated as a CSP as follows:
 
 	\begin{itemize}
-		\item ${\forall}c=(i,j),\ x_{i,j} \in \{0,1\} $
-		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (x_{i,j}=0)$
-		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (\sum_{c^{\prime}=(i^{\prime},j^{\prime}) \in a(c)} x_{i^{\prime},j^{\prime}} = K_{i,j})$
-		\item $(\sum_{c=(i,j)} x_{i,j} = m$
+		\item ${\forall}c=(i,j),\ x_{i,j} \in \{0,1\}$ \hfill ($x_{i,j}$ is either mined or safe)
+		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (x_{i,j}=0)$ \hfill (a cell $c$ with non-negative value is safe)
+		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (\sum_{c^{\prime}=(i^{\prime},j^{\prime}) \in a(c)} x_{i^{\prime},j^{\prime}} = K_{i,j})$ \\ \hfill (the non-negative value on a cell c is the number of adjacent mined cells)
+		\item $\sum_{c=(i,j)} x_{i,j} = m$ \hfill (there are exactly m mined cells)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{CSP Optimization}
+	Inference problem in Minesweeper is a hard problem as it has been proven to be NP-complete [Kaye, 2000]. This justifies developing efficient resolution techniques.
+
+	\begin{itemize}
+		\item Some simple rules, as are already mentioned in the Logic Inference part, allow determining mined or safe cells quickly, and CSP Inference can be used after that.
+		\item Of all the uncovered cells, the interior part does not provide any information on where mines may be lying. In other words, only the boundary should be take into consideration.
+		\item The values observed on the boundary are only related to mines in the fringe, so we can restrict the reasoning about constraints induced to the fringe.
+		\item More to be discovered ...
 	\end{itemize}
 \end{frame}
 
