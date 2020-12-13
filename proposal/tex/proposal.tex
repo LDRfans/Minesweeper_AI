@@ -92,9 +92,28 @@
 \section{CSP Probability Model}
 % Jiahao Huang
 
+\begin{frame}
+	\frametitle{Minesweeper CSP Model}
+	With current observation $K$ (i.e. the knowledge matrix), we can enumerate all configurations compatible with $K$, then
+	\begin{itemize}
+		\item deduce for each cell $c$ whether it is safe (no configuration where $c$ is mined)
+		\item deduce for each cell $c$ whether it is mined ($c$ is mined in all configurations)
+		\item compute the probability for $c$ to be mined as the ratio $$ p_m(c) = \frac{\mbox{\# (cfgs where c is mined)}}{\mbox{\# (all cfgs)}} $$
 
+	\end{itemize}
+\end{frame}
 
+\begin{frame}
+	\frametitle{CSP Formulation}
+	Searching for a single configuration compatible with $K$ can be formulated as a CSP as follows:
 
+	\begin{itemize}
+		\item ${\forall}c=(i,j),\ x_{i,j} \in \{0,1\} $
+		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (x_{i,j}=0)$
+		\item ${\forall}c=(i,j),\ (K_{i,j} \geq 0) \Rightarrow (\sum_{c^{\prime}=(i^{\prime},j^{\prime}) \in a(c)} x_{i^{\prime},j^{\prime}} = K_{i,j})$
+		\item $(\sum_{c=(i,j)} x_{i,j} = m$
+	\end{itemize}
+\end{frame}
 
 %---------------------------------------------------------
 
