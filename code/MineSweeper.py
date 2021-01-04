@@ -7,9 +7,10 @@ LENGTH = 6
 WIDTH = 6
 NMINES = 7
 
+LOGIC = 1
 MINE = -1
 import numpy as np
-
+import random
 
 # the "game board", with state
 class MineSweeper:
@@ -86,15 +87,16 @@ class Logic_inference:
         self.neighborSet = {}
         self.dim1 = LENGTH
         self.dim2 = WIDTH
-        self.state = state
+        self.state = state.copy()
         self.edgeDict = dict()
         self.mines = list()
+        self.selectCell = list()
       
       # Update the state of the game  
       def stateUpdate(self, states):
-        self.state = states
+        self.state = states.copy()
         for mine in self.mines:
-          assert(np.isnan(self.state[mine[0], mine[1]]))
+          #assert(np.isnan(self.state[mine[0], mine[1]]))
           self.state[mine[0], mine[1]] = MINE
 
       # Input a coordinate return a set contains (x,y) of the neighbors
@@ -109,10 +111,14 @@ class Logic_inference:
                 neighbors.append((x + i, y + j))
         return neighbors
       
-
-      def logicInference(self):
-          
-        
+ 
+      def logicInference(self,state):
+        self.selectCell = list()
+        self.stateUpdate(state)
+        self.edgeDictUpdate()
+        self.basicRule1()
+        self.basicRule2()
+        return self.selectCell
         
           
 
@@ -124,7 +130,7 @@ class Logic_inference:
           for y in range(self.dim2):
             if np.isnan(self.state[x,y]):
               continue
-            neighbors = self.getNeighbors(x,y)
+            neighbors = self.getNeighbors((x,y))
             nanSet = list()
             for nb in neighbors:
               if np.isnan(self.state[nb[0], nb[1]]):
@@ -148,13 +154,27 @@ class Logic_inference:
       def basicRule2(self):
         selectCell = list()
         for key in self.edgeDict.keys():
-          if self.state[key[0],key[1]] == self.mineCount(key):
-            selectCell.append(self.edgeDict[key])
-            return selectCell
+          if self.state[key[0], key[1]] == self.mineCount(key):
+            for cell in self.edgeDict[key]:
+              if np.isnan(self.state[cell[0], cell[1]]):
+                self.selectCell.append(cell)
 
       def basicRule3(self):
-        
+        keys = self.edgeDict.keys()
+        for cell in keys:
+          neighbors = self.getNeighbors(cell)
+          for nb in neighbors:
+            if self.state[cell[0], cell[1]] == self.state[nb[0], nb[1]] and nb in keys:
+              if set_issubset(self.edgeDict[cell], self.edgeDict[nb]):
+                diff = set_difference(self.edgeDict[cell], self.edgeDict[nb])
+                self.selectCell.extend(diff)
+
+      def basicRule4(self):
+        keys = self.edgeDict.keys()
+        for cell in keys:
+          neighbors = self.getNeighbors(cell)
           
+
 
 
 
@@ -162,37 +182,57 @@ class Logic_inference:
       def mineCount(self, coordinate):
         count = 0
         for nb in self.getNeighbors(coordinate):
-          if self.state[nb[0],nb[1]] == MINE :
+          if self.state[nb[0], nb[1]] == MINE :
             count += 1
         return count
-                  
-          
 
-
-
-
-
-
-
-
-
-
-
-
-
+def set_difference(a,b):
+  set_a = set(a)
+  set_b = set(b)
+  if set_a.issubset(set_b):
+    return list(set_b - set_a)
+  if set_b.issubset(set_a):
+    return list(set_a - set_b)
+    
+def set_issubset(a, b):
+  set_a = set(a)
+  set_b = set(b)                  
+  if set_a.issubset(set_b) or set_b.issubset(set_a):
+    return True
+  return False        
 
 if __name__ == "__main__":
-    # Init the game
-    game = MineSweeper()
-    print("%dx%d Grid with %d Mines" % (game.dim1, game.dim2, game.nMines))
-    # Play
-    while True:
-        print(game.state)
-        if game.victory:
-            print("You WIN!!!")
-            break
-        y, x = map(lambda var: int(var), input("(y, x) coordinate: ").split(","))
-        game.selectCell((y, x))
-        if game.gameOver:
-            print("BOOM!!!")
-            break
+  game = MineSweeper()
+  logic = Logic_inference(game.state)
+  print("%dx%d Grid with %d Mines" % (game.dim1, game.dim2, game.nMines))
+  while True:
+    print(game.state)
+    if game.victory:
+      print("You WIN!!!")
+      break
+    func = eval(input("Random choose:0, Logic inference:1  "))
+    if func == LOGIC:
+      selectCell = logic.logicInference(game.state)
+      if selectCell == None:
+        print("random")
+        x = random.randint(0, game.dim1 - 1)
+        y = random.randint(0, game.dim2 - 1)
+        game.selectCell((x,y))
+      else:
+        for item in selectCell:
+          print("Select the cell",item)
+          print(logic.state)
+          x = item[0]
+          y = item[1]
+          game.selectCell((x,y))
+          print("****************")
+          print(game.state)
+    else:
+      print("random")
+      x = random.randint(0, game.dim1 - 1)
+      y = random.randint(0, game.dim2 - 1)
+      game.selectCell((x,y))
+    if game.gameOver:
+      print("BOOM!!!")
+      break
+
