@@ -7,9 +7,9 @@ import random
 import numpy as np
 import minesweeper_csp as mc
 
-DIM_1 = 9
-DIM_2 = 9
-NMINES = 8
+DIM_1 = 4
+DIM_2 = 4
+NMINES = 2
 PICK_TIME = 1
 COVERED = -1
 
@@ -157,6 +157,7 @@ if __name__ == "__main__":
             y = random.randint(0, game.dim2 - 1)
             game.selectCell((x,y))
         else:
+            print(cordinate)
             game.selectCell(cordinate)
         if game.gameOver:
             print("BOOM!!!")

@@ -48,7 +48,7 @@ def csp_model(minesweeper):
                 for x,y in surrounding:
                     if minesweeper.flag[x][y]:
                         sum1-=1
-                    if np.isnan(minesweeper.state[row][col]) and not minesweeper.flag[x][y]:
+                    if np.isnan(minesweeper.state[x][y]) and not minesweeper.flag[x][y]:
                         scope.append(variables[x][y])
                 name = str(row) + " " + str(col)
                 if scope:
