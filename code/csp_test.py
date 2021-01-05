@@ -5,6 +5,8 @@ e.g. type 3, 0 to uncover the tile in Row_3, Col_0.
 """
 import random
 import numpy as np
+import minesweeper_csp as mc
+
 DIM_1 = 9
 DIM_2 = 9
 NMINES = 8
@@ -148,9 +150,14 @@ if __name__ == "__main__":
         if game.victory:
             print("You WIN!!!")
             break
-        y, x = map(lambda var: int(var), input(
-            "(y, x) coordinate: ").split(","))
-        game.selectCell((y, x))
+        cordinate = mc.solve_by_step(game)
+        if cordinate == False:
+            print("random")
+            x = random.randint(0, game.dim1 - 1)
+            y = random.randint(0, game.dim2 - 1)
+            game.selectCell((x,y))
+        else:
+            game.selectCell(cordinate)
         if game.gameOver:
             print("BOOM!!!")
             break
