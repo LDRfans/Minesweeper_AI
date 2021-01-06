@@ -1,0 +1,106 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+%\ifcvprfinal\pagestyle{empty}\fi
+\setcounter{page}{4321}
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{CS181 Artificial Intelligence I: \\ Final Project : A Minesweeper Using Inference,  CSP and CNN}
+
+\author{Chenyang Zhang, Chunxu Guo, Jiahao Huang, Qianyu Liu, Tianyi Zhang\\
+
+%Institution1\\
+%Institution1 address\\
+{\tt\small .@shanghaitech.edu.cn}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+%\and
+%Second Author\\
+%Institution2\\
+%First line of institution2 address\\
+%{\tt\small secondauthor@i2.org}
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+Minesweeper is a single-player puzzle video game, whose goal is to clear a rectangular board containing hidden 'mines' or bombs without detonating any of them. This game originates from 1960s and has derived different variants on many computing platforms. In fact, Minesweeper is proved to be Turning Complete and in a class of mathematically difficult problems known as co-NP-complete as well~\cite{coNP}. Exploring algorithms to solve Minesweeper game may inspire us to work out other related problems.
+\end{abstract}
+
+
+%%%%%%%%% BODY TEXT
+\section{Introduction}
+Minesweeper game is basically defined in a custom-sized square matrix with a certain number of mined, the most classical and standard size of mine matrix is 9$\times$9 (beginner),  16$\times$16 (intermediate), 16$\times$30 (advanced), and the standard mine density of advanced one is 20.63\%. (Usually mine density will be higher than this ratio.) 
+
+There are 2 main competitive direction for Minesweeper players, one is speed and the other one is correctness. This report are tend to consider revealing safe cells and flagging convinced mine cells as much as possible within limited time. As it is proved to be an NP-hard problem in 2000, no such algorithm could solve it in linear time complexity so far. Besides, Minesweeper game might sometimes become a non-deterministic problem, which is roughly regarded as a classical models of probability now.(Suppose that all the mine matrices are randomly  generated in the beginning, satisfying the uniform distribution.) Under this circumstance, neither people and computer could definitely reveal or flagged a risk-free cell.
+
+Up to now, multiple artificial Intelligent algorithms have been proposed to solve minesweeper game~\cite{Analysis}. such as Inference, Constraint Satisfaction Problem with backtracking, Markov Decision Process (MDP) or Partially Observable Markov Decision Process (POMDP), Reinforcement Learning, network based on CV and so on. 
+
+
+\section{Basic Rules for Minesweeper}
+In a Minesweeper game, players are given a certain sized visual matrix and the number of unknown mines. By clicking on cell in the matrix, player will safely reward a number behind(sometimes a large area will also be revealed fortunately) or lose the game immediately after detonating a mine. To help judging, player could flag a cell if he is sure there is a mine below and this operation could be aborted as well. Until all the safe cells are revealed, player wins. 
+
+There are 2 useful concepts: 
+	\begin{itemize}
+		\item \textit{Neighbors}: unrevealed one in 8 surrounding blocks are all the neighbors of a given block.
+		\item \textit{Set} : A group of unmarked neighbors around a certain number block.
+	\end{itemize}
+
+And 2 basic rules are follow in Inference and CSP methods:
+	\begin{itemize}
+		\item If \#(items) in set is equal to number on block minus mine neighbours,then all the blocks in set can be marked as mines
+		\item For 2 number blocks \textbf{a} and \textbf{b}, suppose \textbf{A} and \textbf{B} are their corresponding block set, if \textbf{A} $\subseteq$ \textbf{B} and number on \textbf{a} minus \#(marked neighbours) is equal to number on \textbf{b} minus \#(marked neighbours), then blocks in complement of \textbf{A} refer to \textbf{B} can be all revealed safely.
+	\end{itemize}
+	
+\textcolor{red}
+{If no cells in matrix can be determine for sure, computer will randomly choose an unrevealed cell to click on.} 
+
+\section{Our Strategy}
+
+\subsection{Inference}
+
+\subsection{Constraint Satisfaction Problem (CSP) with backtracking}
+
+\subsection{Convolutional Neural Networks (CNN)}
+
+
+\section{Result}
+
+\section{Analysis and comparison}
+
+\section{Discussion}
+
+
+
+{\small
+\bibliographystyle{ieee_fullname}
+\bibliography{egbib}
+}
+
+\end{document}
