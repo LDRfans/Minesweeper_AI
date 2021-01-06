@@ -10,8 +10,8 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 from API import MineSweeper, dataGenerator
 
 IS_TRAIN = 0
-IS_PLAY = 0
-IS_TEST = 1
+IS_PLAY = 1
+IS_TEST = 0
 TRAINING_ROUND = 400
 TESTING_ROUND = 1000
 BATCH_SIZE = 40
@@ -45,6 +45,43 @@ class mineDataset(Dataset):
 
     def __len__(self):
         return len(self.state)
+
+
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        # 1 input image channel, 6 output channels, 3x3 square convolution
+        # kernel
+        self.conv1 = nn.Conv2d(1, 6, 3, padding=1)
+        self.conv2 = nn.Conv2d(6, 10, 3, padding=1)
+        self.conv3 = nn.Conv2d(10, 10, 3, padding=1)
+        self.conv4 = nn.Conv2d(10, 16, 3, padding=1)
+        # self.conv5 = nn.Conv2d(16, 16, 3, padding=1)
+        self.conv6 = nn.Conv2d(16, 16, 3, padding=1)
+        # an affine operation: y = Wx + b
+        self.fc1 = nn.Linear(16 * DIM_1 * DIM_2, 4 * DIM_1 * DIM_2)  # 6*6 from image dimension
+        self.fc2 = nn.Linear(4 * DIM_1 * DIM_2, 2 * DIM_1 * DIM_2)
+        self.fc3 = nn.Linear(2 * DIM_1 * DIM_2, DIM_1 * DIM_2)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        # x = F.relu(self.conv5(x))
+        x = F.relu(self.conv6(x))
+        x = x.view(-1, self.num_flat_features(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        return x
+
+    def num_flat_features(self, x):
+        size = x.size()[1:]  # all dimensions except the batch dimension
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
 
 
 def getMState(map, dim_1=DIM_1, dim_2=DIM_2):
@@ -95,41 +132,18 @@ def edgeDetector(state):
     return edges
 
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        # 1 input image channel, 6 output channels, 3x3 square convolution
-        # kernel
-        self.conv1 = nn.Conv2d(1, 6, 3, padding=1)
-        self.conv2 = nn.Conv2d(6, 10, 3, padding=1)
-        self.conv3 = nn.Conv2d(10, 10, 3, padding=1)
-        self.conv4 = nn.Conv2d(10, 16, 3, padding=1)
-        # self.conv5 = nn.Conv2d(16, 16, 3, padding=1)
-        self.conv6 = nn.Conv2d(16, 16, 3, padding=1)
-        # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * DIM_1 * DIM_2, 4 * DIM_1 * DIM_2)  # 6*6 from image dimension
-        self.fc2 = nn.Linear(4 * DIM_1 * DIM_2, 2 * DIM_1 * DIM_2)
-        self.fc3 = nn.Linear(2 * DIM_1 * DIM_2, DIM_1 * DIM_2)
+def netPlayer(rawState, dim_1=DIM_1, dim_2=DIM_2):
+    # Load model
+    net = torch.load(MODEL_PATH)
 
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        # x = F.relu(self.conv5(x))
-        x = F.relu(self.conv6(x))
-        x = x.view(-1, self.num_flat_features(x))
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        return x
-
-    def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
-        num_features = 1
-        for s in size:
-            num_features *= s
-        return num_features
+    # Play
+    probMap = np.zeros((dim_1, dim_2))
+    state = getMState(rawState)
+    state = torch.Tensor(state).view(1, 1, dim_1, dim_2)
+    output = net(state)
+    probMap = output.view(dim_1, dim_2)
+    x, y = probPicker(rawState, probMap)
+    return x, y
 
 
 if __name__ == "__main__":
