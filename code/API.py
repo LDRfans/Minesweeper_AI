@@ -83,12 +83,14 @@ class MineSweeper:
                 self.gameOver = True
                 self.victory = True
 
-def getMState(map):
-    mState = map
-    for row in range(DIM_1):
-        for col in range(DIM_2):
-            if np.isnan(mState[row, col]):
+def getMState(map, dim_1=DIM_1, dim_2=DIM_2):
+    mState = np.zeros((dim_1, dim_2))
+    for row in range(dim_1):
+        for col in range(dim_2):
+            if np.isnan(map[row, col]):
                 mState[row, col] = COVERED
+            else:
+                mState[row, col] = map[row, col]
     return mState
 
 
@@ -101,14 +103,14 @@ def dataGenerator(dataSize, pickTime, dim_1=DIM_1, dim_2=DIM_2, nMine=NMINES):
         for i in range(pickTime):
             x = random.randint(0, dim_1 - 1)
             y = random.randint(0, dim_2 - 1)
-            # if picks a mine, pick another
-            if game.mines[x, y] == 1:
+            # if picks a mine or number, pick another
+            if game.mines[x, y] == 1 or not np.isnan(game.state[x, y]):
                 i = i - 1
                 continue
             game.selectCell((x, y))
-        print(getMState(game.state))
-        exit()
-        gameState.append(getMState(game.state))
+        # print(game.state)
+        # exit()
+        gameState.append(getMState(game.state, dim_1, dim_2))
         mineMap.append(game.mines)
     return gameState, mineMap
 
