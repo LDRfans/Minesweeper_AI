@@ -3,12 +3,13 @@ MineSweeper Game API.
 You can play the game in terminal.
 e.g. type 3, 0 to uncover the tile in Row_3, Col_0.
 """
-LENGTH = 6
-WIDTH = 6
-NMINES = 7
+LENGTH = 9
+WIDTH = 9
+NMINES = 10
 
 LOGIC = 1
 MINE = -1
+nGames = 1000
 import numpy as np
 import random
 
@@ -27,6 +28,7 @@ class MineSweeper:
         self.initialized = False
         self.gameOver = False
         self.victory = False
+        self.step = 0
 
     def initialize(self, coordinates):  # not run until after first selection!
         # set up mines
@@ -71,6 +73,7 @@ class MineSweeper:
                                 self.clearEmptyCell((x + i, y + j))
 
     def selectCell(self, coordinates):
+        self.step += 1
         if self.mines[coordinates[0], coordinates[1]] > 0:  # condition always fails on first selection
             self.gameOver = True
             self.victory = False
@@ -118,6 +121,9 @@ class Logic_inference:
         self.edgeDictUpdate()
         self.basicRule1()
         self.basicRule2()
+        #self.basicRule3()
+        self.selectCell = set(self.selectCell)
+        self.selectCell = list(self.selectCell) 
         return self.selectCell
         
           
@@ -152,7 +158,6 @@ class Logic_inference:
 
       
       def basicRule2(self):
-        selectCell = list()
         for key in self.edgeDict.keys():
           if self.state[key[0], key[1]] == self.mineCount(key):
             for cell in self.edgeDict[key]:
@@ -202,37 +207,66 @@ def set_issubset(a, b):
   return False        
 
 if __name__ == "__main__":
-  game = MineSweeper()
-  logic = Logic_inference(game.state)
-  print("%dx%d Grid with %d Mines" % (game.dim1, game.dim2, game.nMines))
-  while True:
-    print(game.state)
-    if game.victory:
-      print("You WIN!!!")
-      break
-    func = eval(input("Random choose:0, Logic inference:1  "))
-    if func == LOGIC:
-      selectCell = logic.logicInference(game.state)
-      if selectCell == None:
+  result = list()
+  win = 0
+  for i in range(nGames):
+    print(i)
+    print("***********")
+    game = MineSweeper()
+    logic = Logic_inference(game.state)
+    print("%dx%d Grid with %d Mines" % (game.dim1, game.dim2, game.nMines))
+    func = LOGIC + 1
+    while True:
+      print(game.state)
+      if game.victory:
+        print("You WIN!!!")
+        win += 1
+        break
+
+      
+      #func = eval(input("Random choose:0, Logic inference:1  "))
+      if func == LOGIC:
+        selectCells = logic.logicInference(game.state)
+        print(selectCells)
+        if len(selectCells) == 0:
+          print("random")
+          while True:
+            x = random.randint(0, game.dim1 - 1)
+            y = random.randint(0, game.dim2 - 1)
+            if np.isnan(game.state[x,y]):
+              break
+          game.selectCell((x,y))
+        else:
+          for item in selectCells:
+            print("Logic",item)
+            #print(game.state)
+            x = item[0]
+            y = item[1]
+            game.selectCell((x,y))
+            #print("****************")
+            #print(game.state)
+      else:
         print("random")
         x = random.randint(0, game.dim1 - 1)
         y = random.randint(0, game.dim2 - 1)
         game.selectCell((x,y))
-      else:
-        for item in selectCell:
-          print("Select the cell",item)
-          print(logic.state)
-          x = item[0]
-          y = item[1]
-          game.selectCell((x,y))
-          print("****************")
-          print(game.state)
-    else:
-      print("random")
-      x = random.randint(0, game.dim1 - 1)
-      y = random.randint(0, game.dim2 - 1)
-      game.selectCell((x,y))
-    if game.gameOver:
-      print("BOOM!!!")
-      break
+      if game.gameOver and not game.victory:
+        print("BOOM!!!")
+        print(game.state)
+        break
+    result.append(game.step)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+  print(result)
+  print(sum(result) / nGames)
+  print(win)
 
+
+
+
+
+
+
+
+
+# 1000 9x9 10 MINES LOGIC 28.382
+# 1000 9x9 10 MINES RANDOM 9.114
