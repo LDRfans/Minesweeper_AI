@@ -51,7 +51,7 @@ def csp_model(minesweeper):
 
     for i in range(len(constrains) - 1):
         con1 = constrains[i]
-        for j in range(i+1, len(constrains)):
+        for j in range(i + 1, len(constrains)):
             con2 = constrains[j]
             if set(con1[1]) == set(con2[1]):
                 continue
@@ -64,12 +64,9 @@ def csp_model(minesweeper):
     ol_set = []
     ol_var = []
 
-    # Add new constraints if two constraints has at least two same variables in scope.
-    # Create a new variable for overlap variables.
-    # ex: c1=[v1,v2,v3], c2=[v2,v3,v4] => add c3=[v1,v2v3], c4=[v2v3,v4]. v2v3 is a new variable.
-    for i in range(len(constrains)-1):
+    for i in range(len(constrains) - 1):
         con1 = constrains[i]
-        for j in range(i+1,len(constrains)):
+        for j in range(i + 1, len(constrains)):
             con2 = constrains[j]
             if set(con1[1]) == set(con2[1]):
                 continue
@@ -81,9 +78,9 @@ def csp_model(minesweeper):
                 con2_sum = con2[2]
                 identity = ""
 
-                if not ol_vars in ol_set:
-                    for i in ol_vars:
-                        identity += i.name + ", "
+                if ol_vars not in ol_set:
+                    for v in ol_vars:
+                        identity += v.name + ", "
                     identity = "(" + identity + ")"
                     var = Variable(identity, list(range(len(ol_vars) + 1)))
                     csp.add_var(var)
@@ -97,53 +94,47 @@ def csp_model(minesweeper):
                 con2_vars.add(var)
                 ol_cons.append(["", list(con1_vars), con1_sum])
                 ol_cons.append(["", list(con2_vars), con2_sum])
-
     constrains.extend(ol_cons)
 
-    # Create Constraint object for constraint in cons list.
     for con in constrains:
-        constraint = Constraint(con[0],con[1])
-        tuples = satisfy_tuples(con[1],con[2])
+        constraint = Constraint(con[0], con[1])
+        tuples = satisfy_tuples(con[1], con[2])
         constraint.add_satisfying_tuples(tuples)
         csp.add_constraint(constraint)
 
     return csp
 
 
-def satisfy_tuples(scope, sum1):
+def satisfy_tuples(scope, mine_num):
     product_list = []
-    for var in scope:
-        product_list.append(var.domain())
+    for v in scope:
+        product_list.append(v.domain())
     product = list(itertools.product(*product_list))
     tuples = []
-    for tuple in product:
-        if sum(tuple) == sum1:
-            tuples.append(tuple)
+    for t in product:
+        if sum(t) == mine_num:
+            tuples.append(t)
     return tuples
 
-def solve_by_step(minesweeper):
-    is_assigned = False
 
+def cspPlayer(minesweeper):
     csp = csp_model(minesweeper)
 
     solver = BT(csp)
-    solver.bt_search_MS(prop_FC)
+    solver.bt_search_MS(prop_BT)
     for var in csp.get_all_vars():
-
         try:
             cell = var.name.split()
             row = int(cell[0])
             col = int(cell[1])
         except:
-            # continue if it's not a variable in board.
-            # in board variable name's format: row, col
             continue
 
         if var.get_assigned_value() == 1:
             if not minesweeper.flag[row][col]:
-                minesweeper.flag[row][col]=1
-                solve_by_step(minesweeper)
+                minesweeper.flag[row][col] = 1
+                # solve_by_step(minesweeper)
         elif var.get_assigned_value() == 0:
             if np.isnan(minesweeper.state[row][col]):
-                return row,col
-    return is_assigned
+                return row, col
+    return -1, -1

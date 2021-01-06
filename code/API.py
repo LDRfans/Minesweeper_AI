@@ -85,6 +85,20 @@ class MineSweeper:
                 self.gameOver = True
                 self.victory = True
 
+    def get_surrounding(self, row, col):
+        SURROUNDING = ((-1, -1), (-1, 0), (-1, 1), (0, -1),
+                       (0, 1), (1, -1), (1, 0), (1, 1))
+
+        neighbours = []
+        for pos in SURROUNDING:
+            temp_row = row + pos[0]
+            temp_col = col + pos[1]
+            if 0 <= temp_row < self.dim1 and 0 <= temp_col < self.dim2:
+                neighbours.append((temp_row, temp_col))
+
+        return neighbours
+
+
 def getMState(map, dim_1=DIM_1, dim_2=DIM_2):
     mState = np.zeros((dim_1, dim_2))
     for row in range(dim_1):
@@ -94,29 +108,6 @@ def getMState(map, dim_1=DIM_1, dim_2=DIM_2):
             else:
                 mState[row, col] = map[row, col]
     return mState
-
-
-def get_surrounding(self, row, col):
-    '''Return a list of surrounding buttons of button at row and col in board.
-
-    :param row: int
-    :param col: int
-    :return: list of buttons
-    '''
-
-    SURROUNDING = ((-1, -1), (-1,  0), (-1,  1),
-                    (0, -1),           (0,  1),
-                    (1, -1), (1,  0), (1,  1))
-
-    neighbours = []
-
-    for pos in SURROUNDING:
-        temp_row = row + pos[0]
-        temp_col = col + pos[1]
-        if 0 <= temp_row < self.dim1 and 0 <= temp_col < self.dim2:
-            neighbours.append((temp_row,temp_col))
-
-    return neighbours
 
 
 def dataGenerator(dataSize, pickTime, dim_1=DIM_1, dim_2=DIM_2, nMine=NMINES):
