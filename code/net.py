@@ -10,21 +10,30 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 from API import MineSweeper, dataGenerator
 
 IS_TRAIN = 0
-IS_PLAY = 1
-IS_TEST = 0
-TRAINING_ROUND = 400
+IS_PLAY = 0
+IS_TEST = 1
+TRAINING_ROUND = 600
 TESTING_ROUND = 1000
-BATCH_SIZE = 40
+BATCH_SIZE = 1
 TRAIN_SIZE = 6000
 TEST_SIZE = 600
-LR = 0.05
+LR = 0.01
 ZOOM_FACTOR = 1
-MODEL_PATH = '../model/net_9.pkl'
+MODEL_PATH = '../model/net_12.pkl'
+"""
+# 9x9: ../model/net_9.pkl
+# 16x16: ../model/net_12.pkl
+"""
 
-DIM_1 = 9
-DIM_2 = 9
-NMINES = 9
-PICK_TIME = 7
+DIM_1 = 16
+DIM_2 = 16
+NMINES = 40
+PICK_TIME = 40
+
+# DIM_1 = 9
+# DIM_2 = 9
+# NMINES = 10
+# PICK_TIME = 8
 
 EMPTY = 0.0
 COVERED = -1.0
@@ -168,6 +177,7 @@ if __name__ == "__main__":
 
         best_loss = 10
         overFittingCount = 0
+        f = open("trainingLoss.txt", "w")
 
         for epoch in range(TRAINING_ROUND):
             loss = 0.0
@@ -197,6 +207,9 @@ if __name__ == "__main__":
                     validationLoss += criterion(ZOOM_FACTOR * predict, ZOOM_FACTOR * truth)
             print('[Epoch %d] validationLoss: %f' % (epoch + 1, validationLoss))
 
+            # Write loss record
+            print(validationLoss.item(), file=f)
+
             # Save model
             if validationLoss < best_loss:
                 best_loss = validationLoss
@@ -205,9 +218,10 @@ if __name__ == "__main__":
                 overFittingCount = 0
             else:
                 overFittingCount += 1
-                if overFittingCount > 20:
+                if overFittingCount > 40:
                     break
 
+        f.close()
         print("--- Training Done ---")
 
 

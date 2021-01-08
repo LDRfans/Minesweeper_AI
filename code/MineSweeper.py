@@ -86,11 +86,11 @@ class MineSweeper:
                 self.victory = True
 
 class Logic_inference:
-      def __init__(self, state):
+      def __init__(self, game):
         self.neighborSet = {}
-        self.dim1 = LENGTH
-        self.dim2 = WIDTH
-        self.state = state.copy()
+        self.dim1 = game.dim1
+        self.dim2 = game.dim2
+        self.state = game.state.copy()
         self.edgeDict = dict()
         self.mines = list()
         self.selectCell = list()

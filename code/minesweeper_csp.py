@@ -121,7 +121,7 @@ def cspPlayer(minesweeper):
     csp = csp_model(minesweeper)
 
     solver = BT(csp)
-    solver.bt_search_MS(prop_BT)
+    solver.bt_search_MS(prop_FC)
     for var in csp.get_all_vars():
         try:
             cell = var.name.split()
